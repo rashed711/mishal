@@ -6,13 +6,21 @@ interface TeamMember {
     title: string;
 }
 
-const TeamMemberCard: React.FC<{ member: TeamMember; index: number; isVisible: boolean }> = ({ member, index, isVisible }) => (
+const memberImages = [
+    'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2',
+    'https://images.unsplash.com/photo-1568602471122-7832951cc4c5',
+    'https://images.unsplash.com/photo-1580852300654-034f80071044',
+    'https://images.unsplash.com/photo-1627161683011-c9594825a358',
+    'https://images.unsplash.com/photo-1592823985310-d293e214585c',
+];
+
+const TeamMemberCard: React.FC<{ member: TeamMember; imageIndex: number; isVisible: boolean; index: number }> = ({ member, imageIndex, isVisible, index }) => (
     <div 
-        className={`group relative overflow-hidden rounded-lg shadow-lg opacity-0 ${isVisible ? 'animate-fade-in-up' : ''}`}
+        className={`group relative overflow-hidden rounded-lg shadow-lg w-72 h-96 flex-shrink-0 transition-all duration-500 opacity-0 ${isVisible ? 'animate-fade-in-up' : ''}`}
         style={{ animationDelay: `${0.1 * index}s` }}
     >
         <img 
-            src={`https://picsum.photos/400/500?random=${10 + index}`} 
+            src={memberImages[imageIndex % memberImages.length]} 
             alt={member.name} 
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
         />
@@ -59,9 +67,16 @@ const Team: React.FC = () => {
                     <h2 className="text-3xl md:text-4xl font-bold text-navy mb-2">{t.team.title}</h2>
                     <div className="w-20 h-1 bg-gold mx-auto"></div>
                 </div>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+
+                <div className="flex flex-wrap justify-center gap-8">
                     {t.team.members.map((member: TeamMember, index: number) => (
-                        <TeamMemberCard key={index} member={member} index={index} isVisible={isVisible} />
+                        <TeamMemberCard 
+                            key={`member-${index}`} 
+                            member={member} 
+                            imageIndex={index}
+                            isVisible={isVisible}
+                            index={index}
+                        />
                     ))}
                 </div>
             </div>

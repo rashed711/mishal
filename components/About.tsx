@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 
 const About: React.FC = () => {
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
   const sectionRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -29,11 +29,14 @@ const About: React.FC = () => {
     };
   }, []);
 
+  const textAnimation = isVisible ? (dir === 'ltr' ? 'animate-fade-in-right' : 'animate-fade-in-left') : '';
+  const imageAnimation = isVisible ? (dir === 'ltr' ? 'animate-fade-in-left' : 'animate-fade-in-right') : '';
+
   return (
     <section id="about" className="py-20 bg-white overflow-hidden" ref={sectionRef}>
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div className={`rtl:text-right opacity-0 ${isVisible ? 'animate-fade-in-up' : ''}`} style={{ animationDelay: '0.1s' }}>
+          <div className={`rtl:text-right opacity-0 ${textAnimation}`} style={{ animationDelay: '0.1s' }}>
             <h2 className="text-3xl md:text-4xl font-bold text-navy mb-2">{t.about.title}</h2>
             <div className="w-20 h-1 bg-gold mb-4 rtl:ml-auto"></div>
             <h3 className="text-xl font-bold text-dark-gray mb-4">{t.about.subtitle}</h3>
@@ -47,9 +50,9 @@ const About: React.FC = () => {
               {t.about.cta}
             </a>
           </div>
-          <div className={`opacity-0 ${isVisible ? 'animate-fade-in-up' : ''}`} style={{ animationDelay: '0.3s' }}>
+          <div className={`opacity-0 ${imageAnimation}`} style={{ animationDelay: '0.3s' }}>
             <img 
-              src="https://picsum.photos/600/400?random=2" 
+              src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f" 
               alt="Law Firm Office" 
               className="rounded-lg shadow-2xl w-full h-auto object-cover"
             />

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 
 const SocialIcon: React.FC<{ href: string; children: React.ReactNode }> = ({ href, children }) => (
@@ -10,14 +10,62 @@ const SocialIcon: React.FC<{ href: string; children: React.ReactNode }> = ({ hre
 const Header: React.FC = () => {
     const { lang, setLang, t } = useLanguage();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [activeLink, setActiveLink] = useState('home');
 
     const toggleLanguage = () => {
         setLang(lang === 'en' ? 'ar' : 'en');
     };
     
-    const handleLinkClick = () => {
-        setIsMenuOpen(false);
+    // Smooth scrolling to section with offset for sticky header
+    const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+        e.preventDefault();
+        setActiveLink(targetId); // Immediately set active link on click for instant feedback
+        const element = document.getElementById(targetId);
+        if (element) {
+            const headerOffset = 100; // Estimated height of sticky header
+            const elementPosition = element.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: "smooth"
+            });
+        }
+        setIsMenuOpen(false); // Close mobile menu if open
     };
+
+    // Set active link on scroll
+    useEffect(() => {
+        const sections = Object.keys(t.nav).map(key => document.getElementById(key)).filter(Boolean);
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        setActiveLink(entry.target.id);
+                    }
+                });
+            },
+            {
+                // This defines a precise "trigger zone" for activation.
+                // -100px from top: Starts observing just below the sticky header.
+                // -65% from bottom: Makes the observation area vertically smaller, preventing multiple sections from being active.
+                // This ensures only the section truly at the top of the viewport is highlighted.
+                rootMargin: '-100px 0px -65% 0px',
+                threshold: 0
+            }
+        );
+
+        sections.forEach(section => {
+            if(section) observer.observe(section);
+        });
+
+        return () => {
+            sections.forEach(section => {
+                if(section) observer.unobserve(section);
+            });
+        };
+    }, [t.nav]);
 
     return (
         <header className="bg-navy sticky top-0 z-50 shadow-lg">
@@ -44,14 +92,22 @@ const Header: React.FC = () => {
 
             {/* Main Navigation */}
             <nav className="container mx-auto px-4 py-4 flex justify-between items-center text-white">
-                <a href="#home" className="text-2xl font-bold tracking-wider rtl:font-cairo">
+                <a href="#home" onClick={(e) => handleLinkClick(e, 'home')} className="text-2xl font-bold tracking-wider rtl:font-cairo">
                    <span className="text-gold">MISHAL</span> LAW FIRM
                 </a>
                 
                 {/* Desktop Nav */}
                 <ul className="hidden lg:flex items-center gap-6 rtl:gap-8">
                     {Object.entries(t.nav).map(([key, value]) => (
-                        <li key={key}><a href={`#${key}`} className="py-2 border-b-2 border-transparent hover:border-gold transition-all duration-300">{value as string}</a></li>
+                        <li key={key}>
+                            <a 
+                                href={`#${key}`} 
+                                onClick={(e) => handleLinkClick(e, key)}
+                                className={`py-2 border-b-2 transition-all duration-300 ${activeLink === key ? 'border-gold text-gold' : 'border-transparent hover:text-gold hover:border-gold/50'}`}
+                            >
+                                {value as string}
+                            </a>
+                        </li>
                     ))}
                     <li>
                         <button onClick={toggleLanguage} className="bg-gold text-navy font-bold py-2 px-4 rounded-md hover:bg-opacity-90 transition-all">{t.langSwitch}</button>
@@ -68,7 +124,15 @@ const Header: React.FC = () => {
             <div className={`lg:hidden ${isMenuOpen ? 'block' : 'hidden'}`}>
                  <ul className="flex flex-col items-center gap-4 text-white bg-navy pb-4">
                     {Object.entries(t.nav).map(([key, value]) => (
-                        <li key={key}><a href={`#${key}`} onClick={handleLinkClick} className="py-2">{value as string}</a></li>
+                        <li key={key}>
+                            <a 
+                                href={`#${key}`} 
+                                onClick={(e) => handleLinkClick(e, key)} 
+                                className={`py-2 transition-colors duration-300 ${activeLink === key ? 'text-gold' : 'hover:text-gold'}`}
+                            >
+                                {value as string}
+                            </a>
+                        </li>
                     ))}
                     <li>
                         <button onClick={toggleLanguage} className="bg-gold text-navy font-bold py-2 px-4 rounded-md hover:bg-opacity-90 transition-all">{t.langSwitch}</button>

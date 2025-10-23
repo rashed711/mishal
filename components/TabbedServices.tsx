@@ -40,36 +40,39 @@ const TabbedServices: React.FC = () => {
                     <div className="w-20 h-1 bg-gold mx-auto"></div>
                 </div>
 
-                <div className={`flex flex-wrap justify-center gap-2 md:gap-4 mb-10 opacity-0 ${isVisible ? 'animate-fade-in-up' : ''}`} style={{ animationDelay: '0.2s' }}>
-                    {tabs.map((tab: { title: string }, index: number) => (
+                <div className={`flex items-center justify-start md:justify-center gap-2 md:gap-4 mb-10 overflow-x-auto scrollbar-hide pb-4 opacity-0 ${isVisible ? 'animate-fade-in-up' : ''}`} style={{ animationDelay: '0.2s' }}>
+                    {tabs.map((tab: { title: string, icon: string }, index: number) => (
                         <button
                             key={index}
                             onClick={() => setActiveTab(index)}
-                            className={`py-2 px-6 rounded-md font-semibold transition-all duration-300 ${
+                            className={`py-2 px-6 rounded-md font-semibold transition-all duration-300 flex items-center justify-center flex-shrink-0 ${
                                 activeTab === index 
                                 ? 'bg-navy text-white shadow-lg' 
                                 : 'bg-white text-navy hover:bg-navy hover:text-white'
                             }`}
                         >
-                            {tab.title}
+                           <span className="inline-block" dangerouslySetInnerHTML={{ __html: tab.icon }} />
+                           <span>{tab.title}</span>
                         </button>
                     ))}
                 </div>
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {tabs[activeTab].services.map((service: { title: string }, index: number) => (
+                    {tabs[activeTab].services.map((service: { title: string, image: string }, index: number) => (
                         <div 
                             key={`${activeTab}-${index}`}
-                            className={`bg-white p-6 rounded-lg shadow-md flex items-center gap-4 transition-all duration-300 hover:shadow-xl hover:transform hover:-translate-y-1 opacity-0 rtl:text-right ${isVisible ? 'animate-fade-in-up' : ''}`}
+                            className={`group bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 opacity-0 ${isVisible ? 'animate-fade-in-up' : ''}`}
                             style={{ animationDelay: `${0.05 * index + 0.3}s` }}
                         >
-                            <div className="flex-shrink-0 bg-gold text-navy p-3 rounded-full">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                </svg>
+                            <div className="overflow-hidden h-48">
+                                <img 
+                                    src={service.image} 
+                                    alt={service.title} 
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                />
                             </div>
-                            <div>
-                                <h3 className="text-lg font-bold text-navy">{service.title}</h3>
+                            <div className="p-6 text-center">
+                                <h3 className="text-lg font-bold text-navy h-12 flex items-center justify-center">{service.title}</h3>
                             </div>
                         </div>
                     ))}
